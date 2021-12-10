@@ -18,7 +18,7 @@ def main(placeholder, start_day, end_day, template_dir):
             day_str = "0" + day_str
         new_dir = template_dir.replace(placeholder, day_str)
         shutil.copytree(template_dir, new_dir)
-        rename_files(new_dir, placeholder, str(day_num))
+        rename_files(new_dir, placeholder, day_str)
 
 
 if __name__ == "__main__":
