@@ -1,6 +1,6 @@
-PyAdventOfCode2020
+advent_of_code_2021
 
-My Python solutions to the Advent of Code 2020.
+My Python solutions to the Advent of Code 2021 (structore blatantly copied from Misha)
 
 Spoiler Alert (obviously)! I highly recommend that you try these challenges for yourself before looking at any other people's solutions.
 
