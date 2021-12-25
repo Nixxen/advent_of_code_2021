@@ -1,4 +1,4 @@
-RUN_TEST = True
+RUN_TEST = False
 TEST_SOLUTION = 12
 TEST_INPUT_FILE = "test_input_day_05.txt"
 INPUT_FILE = "input_day_05.txt"
@@ -14,21 +14,40 @@ def get_line_coords(line):
     x_coord_end = int(line.split(" ")[2].split(",")[0])
     y_coord_end = int(line.split(" ")[2].split(",")[1])
 
+    # Determine if line is rising or falling
+    if x_coord < x_coord_end:
+        x_step = 1
+    else:
+        x_step = -1
+    if y_coord < y_coord_end:
+        y_step = 1
+    else:
+        y_step = -1
+
     # Calculate the coordinates, both horizontal, vertical and diagonal
-    if x_coord == x_coord_end:
-        # Horizontal line
-        for y in range(abs(y_coord - y_coord_end) + 1):
-            line_coords.append((x_coord, y + min(y_coord, y_coord_end)))
-    if y_coord == y_coord_end:
-        # Vertical line
-        for x in range(abs(x_coord - x_coord_end) + 1):
-            line_coords.append((x + min(x_coord, x_coord_end), y_coord))
-    if x_coord != x_coord_end and y_coord != y_coord_end:
+    if (
+        x_coord != x_coord_end
+        and y_coord != y_coord_end
+        and abs(x_coord - x_coord_end) == abs(y_coord - y_coord_end)
+    ):
         # Diagonal line. Assume equal delta x and delta y
         for i in range(abs(x_coord - x_coord_end) + 1):
             line_coords.append(
-                (min(x_coord, x_coord_end) + i, min(y_coord, y_coord_end) + i)
+                (
+                    x_coord + i * x_step,
+                    y_coord + i * y_step,
+                )
             )
+    elif x_coord == x_coord_end:
+        # Horizontal line
+        for y in range(abs(y_coord - y_coord_end) + 1):
+            line_coords.append((x_coord, y + min(y_coord, y_coord_end)))
+    elif y_coord == y_coord_end:
+        # Vertical line
+        for x in range(abs(x_coord - x_coord_end) + 1):
+            line_coords.append((x + min(x_coord, x_coord_end), y_coord))
+    else:
+        print("Edge case error: line is not horizontal, vertical or diagonal")
 
     return line_coords
 
