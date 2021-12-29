@@ -141,9 +141,7 @@ def main_part1(
     # bit_stream = BitStream(bin=binary_string)
 
     # Parse the binary string into a list of packets.
-    packets = ""
     packet_versions = []
-    packet_types = []
     packet_datas = []
     index = 0
 
