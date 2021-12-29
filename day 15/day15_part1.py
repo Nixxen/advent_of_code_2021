@@ -14,7 +14,7 @@ def heuristic(current, goal):
 
 
 # Get the neighbors of the current node.
-def get_neighbors(current: tuple, graph: dict, max_x: int, max_y: int) -> list:
+def get_neighbors(current: tuple, max_x: int, max_y: int) -> list:
     # Get neighbors north, south, west and east (not diagonally).
     neighbors = []
     if current[1] > 0:
