@@ -4,8 +4,8 @@ from files_renamer import rename_files
 
 PLACEHOLDER = "XX"
 START_DAY = 1
-END_DAY = 24
-TEMPLATE_DIR = "day XX"
+END_DAY = 25
+TEMPLATE_DIR = "dayXX"
 
 
 def main(placeholder, start_day, end_day, template_dir):
