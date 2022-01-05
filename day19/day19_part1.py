@@ -83,23 +83,38 @@ def main_part1(
     # containing the x,y,z coordinates of the beacons as keys.
     scanners = []
     for line in lines:
-        if "scanner" in line:
+        if line == "":
+            continue
+        if line[1] == "-":  # --- scanner n ---, [1] to handle -x values.
             scanner = {}
             scanner["name"] = line.split()[2]
             scanners.append(scanner)
         else:
             # Parse the line of beacons
-            x, y, z = line.split(",")
+            x, y, z = [int(coord) for coord in line.split(",")]
             scanner[(x, y, z)] = True
 
     # For each scanner, search through every other scanner, flipping the other
     # scanner orientation in each of the 6 directions (each with 4 up
     # orientations making a total of 24 orientations), and see if any of the
     # coordinate keys overlap. If so, add them to the map dictionary.
+    # TODO: Factor out the rotation and axis logic into a function, so that
+    #       I can first find the first match, then use that first match to
+    #       find the next match. We could potentially end up with a case where
+    #       not every scanner is matched... Let's hope we don't need to deal
+    #       with that yet.
+    # TODO: Check for delta distances instead of direct equality. If there are
+    #       12 matches, combined with 4 directions
+    scanner_library = {}
     beacon_map = {}
     for scanner in scanners:
         for other_scanner in scanners:
             if scanner == other_scanner:
+                continue
+            if (
+                scanner["name"] in scanner_library
+                and other_scanner["name"] in scanner_library
+            ):
                 continue
             # Rotate the other scanner 90 degrees around each axis.
             for axis in [0, 1, 2]:  # x, y, z
@@ -108,6 +123,8 @@ def main_part1(
                         # Rotate the other scanner.
                         other_scanner_rotated = {}
                         for key in other_scanner:
+                            if not isinstance(key, tuple):
+                                continue
                             x, y, z = key
                             if axis == 0:
                                 x = x * direction
@@ -115,20 +132,76 @@ def main_part1(
                                 y = y * direction
                             elif axis == 2:
                                 z = z * direction
-                            x, y, z = rotate_point(x, y, z, rotation, axis)
+                            x, y, z = rotate_point((x, y, z), rotation, axis)
                             other_scanner_rotated[(x, y, z)] = True
+                        # Check if any of the rotated coordinates overlap.
+                        match_counter = 0
+                        for key in scanner:
+                            if match_counter < 12:
+                                if key in other_scanner_rotated:
+                                    match_counter += 1
+                            else:
+                                break
 
-            for coordinate in other_scanner:
-                other_scanner[axis] *= -1  # TODO: This won't work. Need to split it up.
-            # Check if any of the keys overlap
-            for key in scanner.keys():
-                if key in other_scanner.keys():
-                    beacon_map[key] = True
-            # Flip the other scanner back
-            for axis in ["x", "y", "z"]:
-                other_scanner[axis] *= -1
+                        if match_counter >= 12:
+                            # Check if either scanner is in the scanner library.
+                            orientation_offset = None
+                            # Simplifies adding to the library later
+                            missing_scanner = None
+                            if scanner["name"] in scanner_library:
+                                # Get the orientation offset from the library.
+                                orientation_offset = scanner_library[scanner["name"]]
+                                missing_scanner = other_scanner
+                            if other_scanner["name"] in scanner_library:
+                                # Get the orientation offset from the library.
+                                orientation_offset = scanner_library[
+                                    other_scanner["name"]
+                                ]
+                                missing_scanner = scanner
 
-    solution = ...
+                            # Store the scanner orientation in the scanner
+                            # library.
+                            if orientation_offset is None:
+                                scanner_library[scanner["name"]] = ((0, 0, 0), (0, 0))
+                                scanner_library[other_scanner["name"]] = (
+                                    (x, y, z),
+                                    (rotation, axis),
+                                )
+                                # Add the coordinates to the beacon map.
+                                for key in scanner:
+                                    if not isinstance(key, tuple):
+                                        continue
+                                    beacon_map[key] = True
+                                for key in other_scanner:
+                                    if not isinstance(key, tuple):
+                                        continue
+                                    beacon_map[key] = True
+                            else:
+                                scanner_library[missing_scanner["name"]] = (
+                                    (
+                                        x + orientation_offset[0][0],
+                                        y + orientation_offset[0][1],
+                                        z + orientation_offset[0][2],
+                                    ),
+                                    (
+                                        rotation + orientation_offset[1][0],
+                                        axis + orientation_offset[1][1],
+                                    ),
+                                )
+                                # Add the coordinates to the beacon map.
+                                for key in missing_scanner:
+                                    if not isinstance(key, tuple):
+                                        continue
+                                    beacon_map[
+                                        (
+                                            key[0] + orientation_offset[0][0],
+                                            key[1] + orientation_offset[0][1],
+                                            key[2] + orientation_offset[0][2],
+                                        )
+                                    ] = True
+
+    # Count the number of beacons in the map.
+    solution = len(beacon_map)
     return solution
 
 

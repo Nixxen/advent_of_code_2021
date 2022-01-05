@@ -1,7 +1,4 @@
-test_module = __import__("day 19")
-from test_module import day19_part1 as test_code
-
-# from .day 19 import day19_part1 as test_code
+from day19 import day19_part1 as test_code
 
 # Rotate point tests
 # rotate_point(point: tuple, rotation: int, axis: int) -> tuple
